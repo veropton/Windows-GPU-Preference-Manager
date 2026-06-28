@@ -1,67 +1,68 @@
 # Windows GPU Preference Manager
 
-> Script PowerShell interativo para configurar preferencia de GPU por app no Windows 10 e Windows 11.
+> Interactive PowerShell script to set per-app GPU preference on Windows 10 and Windows 11.
 
-Windows GPU Preference Manager, tambem distribuido como `SmartGraphicsPreference`, ajuda a escolher quais aplicativos devem usar a GPU de alto desempenho no Windows. Ele automatiza o caminho manual de Configuracoes > Sistema > Video > Configuracoes de elementos graficos e funciona direto no terminal, sem instalador e sem dependencia obrigatoria.
+Windows GPU Preference Manager, also distributed as `SmartGraphicsPreference`, helps you choose which Windows apps should use the high-performance GPU. It automates the manual Windows path in Settings > System > Display > Graphics settings and runs directly in the terminal with no required installer.
 
-Descricao curta para GitHub: `Script PowerShell interativo para configurar preferencia de GPU por app no Windows`
+[Leia em Portugues](README.pt-BR.md)
 
-Topics recomendadas: `powershell`, `windows`, `gpu`, `windows10`, `windows11`
+GitHub description: `Interactive PowerShell script to set per-app GPU preference on Windows`
 
-## Por Que Existe
+Recommended topics: `powershell`, `windows`, `gpu`, `windows10`, `windows11`
 
-No Windows, a preferencia de GPU por aplicativo fica escondida nas configuracoes graficas do sistema. Para quem usa notebook com GPU integrada e dedicada, ou alterna entre apps como navegador, Discord, OBS, VLC, Blender, editores e jogos, fazer isso manualmente e lento.
+## Why
 
-Este projeto lista os apps em execucao, destaca os que costumam se beneficiar da GPU dedicada e aplica a preferencia de alto desempenho no registro do usuario atual.
+Windows lets you choose a GPU preference per app, but the option is buried in the system graphics settings. If you use a laptop with integrated and dedicated graphics, or switch between browsers, Discord, OBS, VLC, Blender, editors and games, configuring this manually is slow.
 
-## Recursos
+This project lists running apps, highlights apps that usually benefit from a dedicated GPU, and writes the high-performance preference for the current Windows user.
 
-- Detecta automaticamente aplicativos em execucao com caminho valido
-- Filtra processos de sistema e ruido comum do Windows
-- Recomenda apps conhecidos que costumam usar aceleracao grafica
-- Mostra uso de GPU em tempo real quando os contadores do Windows estao disponiveis
-- Aplica alto desempenho em um app, varios apps ou todos os recomendados
-- Permite buscar por nome de app direto no terminal
-- Usa toggle para remover a preferencia e voltar ao padrao do sistema
-- Roda com PowerShell 5.1+ no Windows 10 e Windows 11
+## Features
 
-## Casos De Uso
+- Detects running apps with a valid executable path
+- Filters common Windows system processes and terminal noise
+- Recommends known GPU-accelerated apps automatically
+- Shows live GPU usage when Windows GPU counters are available
+- Sets high-performance GPU preference for one app, many apps, or all recommended apps
+- Includes a terminal search/filter command
+- Uses a toggle flow to remove a preference and return to the Windows default
+- Runs on PowerShell 5.1+ in Windows 10 and Windows 11
 
-- Forcar navegador, player de video ou app de streaming a usar GPU dedicada
-- Ajustar Discord, OBS, VLC, Blender, editores e launchers de jogos com menos cliques
-- Conferir quais apps estao usando GPU no momento
-- Compartilhar uma ferramenta simples para usuarios Windows sem instalar um app pesado
+## Use Cases
 
-## Estrutura
+- Force a browser, video player, streaming app, game launcher, or creative tool to use the dedicated GPU
+- Tune Discord, OBS, VLC, Blender, editing tools, and game launchers with fewer clicks
+- Check which running apps are currently using GPU resources
+- Share a lightweight Windows utility without shipping a heavy desktop app
+
+## Repository Structure
 
 ```text
 Windows-GPU-Preference-Manager/
-|-- SmartGraphicsPreference.ps1   # Script principal
-|-- SmartGPU.bat                  # Launcher para duplo clique
+|-- SmartGraphicsPreference.ps1   # Main PowerShell script
+|-- SmartGPU.bat                  # Double-click launcher
 |-- build/
-|   `-- build.ps1                 # Gera .exe com ps2exe
+|   `-- build.ps1                 # Builds an optional .exe with ps2exe
 |-- README.md
+|-- README.pt-BR.md
 |-- LICENSE
 `-- .gitignore
 ```
 
-## Como Usar
+## Requirements
 
-### Requisitos
+- Windows 10 or Windows 11
+- PowerShell 5.1 or newer
+- A dedicated GPU, such as NVIDIA, AMD Radeon, or Intel Arc, if you want to use high-performance mode
 
-- Windows 10 ou Windows 11
-- PowerShell 5.1 ou superior
-- GPU dedicada, como NVIDIA, AMD Radeon ou Intel Arc, quando quiser usar alto desempenho
+## Usage
 
-### Rodar Pelo PowerShell
+Run from PowerShell:
 
 ```powershell
 PowerShell -ExecutionPolicy Bypass -File "SmartGraphicsPreference.ps1"
 ```
 
-### Rodar Por Duplo Clique
-
-Execute `SmartGPU.bat` na mesma pasta do `SmartGraphicsPreference.ps1`.
+Or double-click `SmartGPU.bat` from the same folder as `SmartGraphicsPreference.ps1`.
 
 ## Interface
 
@@ -85,55 +86,55 @@ Execute `SmartGPU.bat` na mesma pasta do `SmartGraphicsPreference.ps1`.
     sair         Fechar
 ```
 
-## Comandos
+## Commands
 
-| Comando | Acao |
+| Command | Action |
 |---|---|
-| `1` | Ativa ou remove a preferencia do app numero 1 |
-| `1,3,5` | Ativa ou remove varios apps de uma vez |
-| `rec` | Aplica alto desempenho em todos os recomendados pendentes |
-| `busca discord` | Filtra a lista por nome |
-| `todos` | Limpa o filtro atual |
-| `sair` | Fecha o script |
+| `1` | Enables or removes the preference for app number 1 |
+| `1,3,5` | Enables or removes several apps at once |
+| `rec` | Applies high-performance preference to all pending recommended apps |
+| `busca discord` | Filters the list by app name |
+| `todos` | Clears the current filter |
+| `sair` | Exits the script |
 
-Depois de alterar a preferencia de GPU, reinicie os aplicativos afetados para garantir que o Windows aplique a mudanca.
+Restart affected apps after changing GPU preference so Windows can apply the new setting.
 
-## Gerar Executavel
+## Build Optional EXE
 
-O executavel e opcional. O script PowerShell funciona sozinho.
+The `.exe` is optional. The PowerShell script works by itself.
 
 ```powershell
 PowerShell -ExecutionPolicy Bypass -File "build\build.ps1"
 ```
 
-O build usa o modulo `ps2exe`. Se ele nao estiver instalado, o script tenta instalar automaticamente para o usuario atual.
+The build script uses `ps2exe`. If the module is not installed, it tries to install it for the current user.
 
-## Como Funciona
+## How It Works
 
-O script grava preferencias em:
+The script writes per-user GPU preferences to:
 
 ```text
 HKCU\SOFTWARE\Microsoft\DirectX\UserGpuPreferences
 ```
 
-Ele usa `GpuPreference=2` para alto desempenho, que e o mesmo tipo de configuracao feita pela tela de configuracoes graficas do Windows. A alteracao vale para o usuario atual.
+It uses `GpuPreference=2` for high performance, matching the Windows Graphics settings behavior. The change applies to the current Windows user.
 
-## Palavras-Chave
+## Search Keywords
 
-PowerShell, Windows, Windows 10, Windows 11, GPU, dedicated GPU, integrated GPU, NVIDIA, AMD Radeon, Intel Arc, graphics settings, GPU preference, per-app GPU preference, UserGpuPreferences, alto desempenho, preferencia grafica.
+PowerShell, Windows, Windows 10, Windows 11, GPU, dedicated GPU, integrated GPU, NVIDIA, AMD Radeon, Intel Arc, graphics settings, GPU preference, per-app GPU preference, UserGpuPreferences, high performance GPU, Windows graphics settings.
 
-## Contribuir
+## Contributing
 
-A forma mais simples de contribuir e adicionar apps conhecidos ao dicionario `$appsDB` em `SmartGraphicsPreference.ps1`.
+The easiest contribution is adding known apps to the `$appsDB` dictionary in `SmartGraphicsPreference.ps1`.
 
 ```powershell
 $appsDB = @{
-    "meuapp" = @{ Cat = "Video"; Rec = $true }
+    "myapp" = @{ Cat = "Video"; Rec = $true }
 }
 ```
 
-Use `Rec = $true` para apps que normalmente se beneficiam de GPU dedicada. Use `Rec = $false` para apps que devem aparecer categorizados, mas sem recomendacao automatica.
+Use `Rec = $true` for apps that usually benefit from a dedicated GPU. Use `Rec = $false` for apps that should be categorized without an automatic recommendation.
 
-## Licenca
+## License
 
-MIT. Veja `LICENSE`.
+MIT. See `LICENSE`.
