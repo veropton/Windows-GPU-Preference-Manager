@@ -463,53 +463,109 @@ $appDatabase = @{
     "vivaldi"            = @{ Category = "Browser";       Recommended = $true  }
     "thorium"            = @{ Category = "Browser";       Recommended = $true  }
     "waterfox"           = @{ Category = "Browser";       Recommended = $true  }
+    "arc"                = @{ Category = "Browser";       Recommended = $true  }
+    "floorp"             = @{ Category = "Browser";       Recommended = $true  }
+    "tor"                = @{ Category = "Browser";       Recommended = $true  }
     # Video
     "vlc"                = @{ Category = "Video";         Recommended = $true  }
     "mpc-hc64"           = @{ Category = "Video";         Recommended = $true  }
     "mpc-hc"             = @{ Category = "Video";         Recommended = $true  }
+    "mpc-be64"           = @{ Category = "Video";         Recommended = $true  }
+    "mpc-be"             = @{ Category = "Video";         Recommended = $true  }
     "mpv"                = @{ Category = "Video";         Recommended = $true  }
+    "potplayermini64"    = @{ Category = "Video";         Recommended = $true  }
+    "potplayermini"      = @{ Category = "Video";         Recommended = $true  }
+    "kmplayer"           = @{ Category = "Video";         Recommended = $true  }
+    "gom"                = @{ Category = "Video";         Recommended = $true  }
     "wmplayer"           = @{ Category = "Video";         Recommended = $true  }
     "plex"               = @{ Category = "Video";         Recommended = $true  }
-    # Design / 3D
+    # Design / 3D / CAD
     "blender"            = @{ Category = "3D";            Recommended = $true  }
+    "maya"               = @{ Category = "3D";            Recommended = $true  }
+    "3dsmax"             = @{ Category = "3D";            Recommended = $true  }
+    "acad"               = @{ Category = "3D";            Recommended = $true  }
+    "sldworks"           = @{ Category = "3D";            Recommended = $true  }
+    "sketchup"           = @{ Category = "3D";            Recommended = $true  }
+    "rhino"              = @{ Category = "3D";            Recommended = $true  }
+    "cinema 4d"          = @{ Category = "3D";            Recommended = $true  }
     "photoshop"          = @{ Category = "Design";        Recommended = $true  }
     "illustrator"        = @{ Category = "Design";        Recommended = $true  }
+    "lightroom"          = @{ Category = "Design";        Recommended = $true  }
+    "indesign"           = @{ Category = "Design";        Recommended = $true  }
     "krita"              = @{ Category = "Design";        Recommended = $true  }
     "gimp-2.10"          = @{ Category = "Design";        Recommended = $true  }
     "gimp"               = @{ Category = "Design";        Recommended = $true  }
     "inkscape"           = @{ Category = "Design";        Recommended = $true  }
     "figma"              = @{ Category = "Design";        Recommended = $true  }
-    # Video editing
+    "clipstudio"         = @{ Category = "Design";        Recommended = $true  }
+    "painttoolksa"       = @{ Category = "Design";        Recommended = $true  }
+    "sai"                = @{ Category = "Design";        Recommended = $true  }
+    "coreldrw"           = @{ Category = "Design";        Recommended = $true  }
+    "substance_painter"  = @{ Category = "Design";        Recommended = $true  }
+    "marmoset"           = @{ Category = "Design";        Recommended = $true  }
+    # Video & Audio Editing
     "premiere"           = @{ Category = "Video Edit";    Recommended = $true  }
     "afterfx"            = @{ Category = "Video Edit";    Recommended = $true  }
     "resolve"            = @{ Category = "Video Edit";    Recommended = $true  }
     "fusion"             = @{ Category = "Video Edit";    Recommended = $true  }
     "vegas130"           = @{ Category = "Video Edit";    Recommended = $true  }
+    "vegas"              = @{ Category = "Video Edit";    Recommended = $true  }
     "kdenlive"           = @{ Category = "Video Edit";    Recommended = $true  }
     "handbrake"          = @{ Category = "Video Edit";    Recommended = $true  }
+    "audition"           = @{ Category = "Video Edit";    Recommended = $true  }
     # Streaming
     "obs64"              = @{ Category = "Streaming";     Recommended = $true  }
     "obs32"              = @{ Category = "Streaming";     Recommended = $true  }
     "streamlabsobs"      = @{ Category = "Streaming";     Recommended = $true  }
-    # Games / launchers
+    # Games & Launchers
     "steam"              = @{ Category = "Games";         Recommended = $true  }
     "epicgameslauncher"  = @{ Category = "Games";         Recommended = $true  }
     "leagueclient"       = @{ Category = "Games";         Recommended = $true  }
     "riotclient"         = @{ Category = "Games";         Recommended = $true  }
     "battlenet"          = @{ Category = "Games";         Recommended = $true  }
     "goggalaxy"          = @{ Category = "Games";         Recommended = $true  }
+    "galaxyclient"       = @{ Category = "Games";         Recommended = $true  }
     "gameoverlayui"      = @{ Category = "Games";         Recommended = $true  }
+    "origin"             = @{ Category = "Games";         Recommended = $true  }
+    "eadesktop"          = @{ Category = "Games";         Recommended = $true  }
+    "upc"                = @{ Category = "Games";         Recommended = $true  }
+    "uplay"              = @{ Category = "Games";         Recommended = $true  }
+    "larianlauncher"     = @{ Category = "Games";         Recommended = $true  }
+    "minecraft"          = @{ Category = "Games";         Recommended = $true  }
+    "javaw"              = @{ Category = "Games";         Recommended = $true  }
+    "robloxplayerbeta"   = @{ Category = "Games";         Recommended = $true  }
+    "robloxplayer"       = @{ Category = "Games";         Recommended = $true  }
+    "robloxstudio"       = @{ Category = "Games";         Recommended = $true  }
+    "cs2"                = @{ Category = "Games";         Recommended = $true  }
+    "csgo"               = @{ Category = "Games";         Recommended = $true  }
+    "valorant-win64-shipping" = @{ Category = "Games";    Recommended = $true  }
+    "genshinimpact"      = @{ Category = "Games";         Recommended = $true  }
+    "starrail"           = @{ Category = "Games";         Recommended = $true  }
+    "fortniteclient-win64-shipping" = @{ Category = "Games"; Recommended = $true  }
+    "gta5"               = @{ Category = "Games";         Recommended = $true  }
+    "fivem"              = @{ Category = "Games";         Recommended = $true  }
+    "cyberpunk2077"      = @{ Category = "Games";         Recommended = $true  }
+    "rdr2"               = @{ Category = "Games";         Recommended = $true  }
     # Communication apps with GPU acceleration
     "discord"            = @{ Category = "Communication"; Recommended = $true  }
     "zoom"               = @{ Category = "Communication"; Recommended = $true  }
     "teams"              = @{ Category = "Communication"; Recommended = $false }
     "slack"              = @{ Category = "Communication"; Recommended = $false }
-    # Developer tools, usually not recommended by default
+    "telegram"           = @{ Category = "Communication"; Recommended = $false }
+    "whatsapp"           = @{ Category = "Communication"; Recommended = $false }
+    # Developer tools & Game Engines
+    "unity"              = @{ Category = "Developer";     Recommended = $true  }
+    "unrealeditor"       = @{ Category = "Developer";     Recommended = $true  }
+    "godot"              = @{ Category = "Developer";     Recommended = $true  }
     "code"               = @{ Category = "Developer";     Recommended = $false }
     "devenv"             = @{ Category = "Developer";     Recommended = $false }
     "rider64"            = @{ Category = "Developer";     Recommended = $false }
     "webstorm64"         = @{ Category = "Developer";     Recommended = $false }
     "pycharm64"          = @{ Category = "Developer";     Recommended = $false }
+    "idea64"             = @{ Category = "Developer";     Recommended = $false }
+    "studio64"           = @{ Category = "Developer";     Recommended = $false }
+    "phpstorm64"         = @{ Category = "Developer";     Recommended = $false }
+    "cursor"             = @{ Category = "Developer";     Recommended = $false }
 }
 
 # System processes hidden from the interactive list
@@ -733,4 +789,5 @@ while ($true) {
 Write-Host ""
 Write-Host "  $($txt.DoneMessage)" -ForegroundColor Magenta
 Write-Host ""
+
 
