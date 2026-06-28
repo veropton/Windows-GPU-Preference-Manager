@@ -14,8 +14,9 @@
 - Updated the batch wrapper script `SmartGPU.bat` to forward CLI arguments.
 - Significantly expanded the GPU-accelerated application database with more than 35 new entries (browsers, media players, CAD tools, games, launchers, developer environments).
 - Re-built and verified the standalone compilation executable `SmartGraphicsPreference.exe`.
-- Staged, committed, and synced modifications to git repository.
 - Created `PROJECT.md` and `ARCHITECTURE.md` to provide structured project context.
+- Implemented **Windows Gaming Tweaks** menu featuring 5 system-level gaming performance categories, auto-elevation checks, dynamic JSON backup (`.sgp-backup.json`), and granular/full restore logic.
+- Standardized translations for all tweaks strings across the 8 supported languages.
 
 ---
 

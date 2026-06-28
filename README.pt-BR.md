@@ -81,6 +81,11 @@ PowerShell -ExecutionPolicy Bypass -File "SmartGraphicsPreference.ps1" -Language
 ```
 *(Códigos de idioma suportados: `en`, `pt`, `es`, `fr`, `de`, `zh`, `ja`, `it`)*
 
+Para abrir o menu diretamente na tela de Otimizações de Jogos, passe o argumento `-Menu`:
+```powershell
+PowerShell -ExecutionPolicy Bypass -File "SmartGraphicsPreference.ps1" -Menu tweaks
+```
+
 ---
 
 ## 🗺️ Suporte a Idiomas
@@ -140,11 +145,27 @@ Ao iniciar, a ferramenta detecta automaticamente o idioma de exibição do Windo
 | `1,3,5` | Alterna preferências para múltiplos aplicativos listados de uma vez (separados por vírgula). |
 | `rec` / `aplicar` | Aplica automaticamente a preferência de Alto Desempenho para todos os recomendados pendentes. |
 | `busca chrome` | Filtra a exibição da tabela para mostrar apenas processos contendo "chrome". |
+| `ajustes` | Abre o menu de otimizações de jogos (Windows Gaming Tweaks). |
 | `todos` | Redefine a lista e limpa qualquer filtro de busca ativo. |
 | `sair` | Fecha o utilitário com segurança. |
 
 > [!NOTE]
 > Após alterar as preferências, reinicie os aplicativos afetados para que o Windows passe a usar a GPU configurada.
+
+---
+
+## 🛠️ Otimizações de Desempenho de Jogos do Windows
+
+O menu de otimizações oferece acesso a 5 categorias de melhorias no sistema:
+1. **Ajuste de Serviços:** Desativa serviços secundários em segundo plano (Print Spooler, Fax, SysMain/Superfetch, Windows Error Reporting).
+2. **Rede e Latência:** Desativa o algoritmo Nagle (TCP No Delay e TCP Ack Frequency) nos adaptadores ativos, prioriza a responsividade de rede para jogos e desativa a limitação de tráfego (Network Throttling).
+3. **Visual e Energia:** Otimiza os efeitos visuais para melhor desempenho e ativa o plano de energia de "Desempenho Máximo" (Ultimate Performance).
+4. **Telemetria e Privacidade:** Desativa as políticas de coleta de dados de telemetria e o serviço de rastreamento de diagnósticos.
+5. **Serviços Xbox e DVR:** Desativa a sobreposição de captura Game DVR e os serviços em segundo plano do Xbox Live.
+
+> [!IMPORTANT]
+> - A aplicação dessas melhorias requer privilégios de Administrador. Se executado no modo padrão, o script solicitará permissão e reiniciará automaticamente em uma janela elevada.
+> - Antes de qualquer modificação, a ferramenta cria um backup dinâmico `.sgp-backup.json` na pasta do script. Você pode reverter todas as otimizações para os valores originais do seu sistema a qualquer momento usando o comando `restaurar` ou `desfazer` dentro do próprio menu de otimizações.
 
 ---
 

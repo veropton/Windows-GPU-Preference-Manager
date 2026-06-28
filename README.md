@@ -140,11 +140,27 @@ Upon starting, the tool automatically detects your Windows display culture and u
 | `1,3,5` | Toggles preferences for multiple listed applications simultaneously (separated by commas). |
 | `rec` / `apply` | Automatically applies the High Performance preference to all pending recommended applications. |
 | `search chrome` | Filters the table view to only show processes containing "chrome". |
+| `tweaks` | Opens the Windows Gaming Tweaks optimization menu. |
 | `all` | Resets the list and clears any active filters. |
 | `quit` | Safely closes the utility. |
 
 > [!NOTE]
 > After modifying preferences, restart the target applications for Windows to apply the new GPU routing behavior.
+
+---
+
+## ⚙️ Windows Gaming Tweaks
+
+The tweaks menu provides access to 5 system-level optimization categories:
+1. **Services Tuning:** Disables non-essential background services (Print Spooler, Fax, SysMain/Superfetch, Windows Error Reporting).
+2. **Network & Latency:** Disables Nagle's TCP algorithm (TCP No Delay & TCP Ack Frequency) on active adapters, sets priority system gaming responsiveness, and disables network throttling.
+3. **Visuals & Power:** Optimizes visual effects for maximum performance and activates the "Ultimate Performance" system power scheme.
+4. **Telemetry & Privacy:** Disables diagnostic telemetry policies and the Connected User Experiences service.
+5. **Game Bar & Xbox:** Disables Game DVR capture overlays and Xbox Live backend startup services.
+
+> [!IMPORTANT]
+> - Applying these tweaks requires Administrator privileges. If the script is run in standard mode, it will prompt for confirmation and automatically relaunch itself elevated in a new console window.
+> - Before modifying any system settings, a dynamic backup file `.sgp-backup.json` is created in the script folder. You can revert all tweaks to their exact original states at any time using the `restore` or `undo` command in the tweaks menu.
 
 ---
 

@@ -20,6 +20,7 @@
 - **Recommended Database:** Detects and flags typical GPU-intensive programs (browsers, video editors, games, game engines, CAD/3D software).
 - **Multilingual Support:** Auto-detects and formats UI outputs based on system locale or CLI argument flags.
 - **Real-Time Monitoring:** Retrieves live 3D GPU engine performance counters per process.
+- **Windows Gaming Tweaks:** System-level performance optimizations across 5 categories, with automated UAC Admin elevation relaunch, dynamic backups (`.sgp-backup.json`), and complete restore capabilities.
 
 ---
 
@@ -27,4 +28,4 @@
 - **Operating System:** Windows 10 / Windows 11 only.
 - **Shell Engine:** PowerShell 5.1 or newer.
 - **Encoding Requirements:** Unicode UTF-8 with BOM is mandatory to ensure CJK character sets (Chinese and Japanese) compile and render correctly in legacy Windows consoles.
-- **Registry Permissions:** Modifies user-level registry entries under the current user hive (`HKCU`), avoiding the need for administrator elevation.
+- **Registry & Privilege Permissions:** Modifies user-level registry entries under the current user hive (`HKCU`) for GPU preferences (no elevation needed). System tweaks require administrative privileges; standard mode users are automatically prompted for UAC elevation to apply and revert changes.
