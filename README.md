@@ -1,75 +1,71 @@
-# SmartGraphicsPreference
+# Windows GPU Preference Manager
 
-> Script PowerShell interativo para configurar a preferência de GPU por aplicativo no Windows — zero config, com monitor de uso de GPU em tempo real e recomendações automáticas.
+> Script PowerShell interativo para configurar preferencia de GPU por app no Windows 10 e Windows 11.
 
----
+Windows GPU Preference Manager, tambem distribuido como `SmartGraphicsPreference`, ajuda a escolher quais aplicativos devem usar a GPU de alto desempenho no Windows. Ele automatiza o caminho manual de Configuracoes > Sistema > Video > Configuracoes de elementos graficos e funciona direto no terminal, sem instalador e sem dependencia obrigatoria.
 
-## Sumário
+Descricao curta para GitHub: `Script PowerShell interativo para configurar preferencia de GPU por app no Windows`
 
-- [Visão Geral](#visão-geral)
-- [Funcionalidades](#funcionalidades)
-- [Estrutura do Repositório](#estrutura-do-repositório)
-- [Como Usar](#como-usar)
-- [Compilar para .exe](#compilar-para-exe)
-- [Como Contribuir](#como-contribuir)
-- [Licença](#licença)
+Topics recomendadas: `powershell`, `windows`, `gpu`, `windows10`, `windows11`
 
----
+## Por Que Existe
 
-## Visão Geral
+No Windows, a preferencia de GPU por aplicativo fica escondida nas configuracoes graficas do sistema. Para quem usa notebook com GPU integrada e dedicada, ou alterna entre apps como navegador, Discord, OBS, VLC, Blender, editores e jogos, fazer isso manualmente e lento.
 
-O Windows permite definir manualmente qual GPU cada aplicativo deve usar (integrada ou dedicada) em **Configurações → Sistema → Vídeo → Configurações de Elementos Gráficos**. Fazer isso manualmente é lento. Este script automatiza o processo com uma interface interativa no terminal.
+Este projeto lista os apps em execucao, destaca os que costumam se beneficiar da GPU dedicada e aplica a preferencia de alto desempenho no registro do usuario atual.
 
----
+## Recursos
 
-## Funcionalidades
+- Detecta automaticamente aplicativos em execucao com caminho valido
+- Filtra processos de sistema e ruido comum do Windows
+- Recomenda apps conhecidos que costumam usar aceleracao grafica
+- Mostra uso de GPU em tempo real quando os contadores do Windows estao disponiveis
+- Aplica alto desempenho em um app, varios apps ou todos os recomendados
+- Permite buscar por nome de app direto no terminal
+- Usa toggle para remover a preferencia e voltar ao padrao do sistema
+- Roda com PowerShell 5.1+ no Windows 10 e Windows 11
 
-- **Zero configuração** — detecta automaticamente todos os processos em execução
-- **Filtro de ruído** — oculta processos de sistema irrelevantes (svchost, conhost, etc.)
-- **Base de conhecimento** — identifica e categoriza +40 apps conhecidos (navegadores, games, editores, streaming)
-- **Recomendações automáticas** — apps GPU-intensivos aparecem destacados como `[RECOMENDADO]`
-- **Monitor de GPU em tempo real** — exibe o uso real de GPU (%) por processo via contadores do Windows
-- **Aplicação em lote** — comando `rec` configura todos os recomendados de uma vez
-- **Busca/filtro** — filtra a lista digitando parte do nome do app
-- **Toggle** — digitar o número de um app já configurado o remove (reverte ao padrão)
+## Casos De Uso
 
----
+- Forcar navegador, player de video ou app de streaming a usar GPU dedicada
+- Ajustar Discord, OBS, VLC, Blender, editores e launchers de jogos com menos cliques
+- Conferir quais apps estao usando GPU no momento
+- Compartilhar uma ferramenta simples para usuarios Windows sem instalar um app pesado
 
-## Estrutura do Repositório
+## Estrutura
 
+```text
+Windows-GPU-Preference-Manager/
+|-- SmartGraphicsPreference.ps1   # Script principal
+|-- SmartGPU.bat                  # Launcher para duplo clique
+|-- build/
+|   `-- build.ps1                 # Gera .exe com ps2exe
+|-- README.md
+|-- LICENSE
+`-- .gitignore
 ```
-SmartGraphicsPreference/
-├── SmartGraphicsPreference.ps1   # Script principal
-├── SmartGPU.bat                  # Launcher (duplo clique para rodar)
-├── build/
-│   └── build.ps1                 # Compila o script para .exe com ps2exe
-├── README.md
-└── LICENSE
-```
-
----
 
 ## Como Usar
 
-### Pré-requisitos
+### Requisitos
 
-- Windows 10 ou 11
-- PowerShell 5.1+ (já incluso no Windows)
-- GPU dedicada (NVIDIA, AMD ou Intel Arc)
+- Windows 10 ou Windows 11
+- PowerShell 5.1 ou superior
+- GPU dedicada, como NVIDIA, AMD Radeon ou Intel Arc, quando quiser usar alto desempenho
 
-### Opção 1 — Direto pelo PowerShell
+### Rodar Pelo PowerShell
 
 ```powershell
 PowerShell -ExecutionPolicy Bypass -File "SmartGraphicsPreference.ps1"
 ```
 
-### Opção 2 — Duplo clique (sem abrir o PowerShell)
+### Rodar Por Duplo Clique
 
-Execute o arquivo `SmartGPU.bat`. O `.ps1` deve estar na mesma pasta.
+Execute `SmartGPU.bat` na mesma pasta do `SmartGraphicsPreference.ps1`.
 
-### Interface
+## Interface
 
-```
+```text
   =====================================================
     Preferencia Grafica Inteligente   [Alto Desempenho]
   =====================================================
@@ -89,74 +85,55 @@ Execute o arquivo `SmartGPU.bat`. O `.ps1` deve estar na mesma pasta.
     sair         Fechar
 ```
 
-### Comandos disponíveis
+## Comandos
 
-| Comando | Descrição |
+| Comando | Acao |
 |---|---|
-| `1` | Ativa ou remove o app de número 1 (toggle) |
-| `1,3,5` | Ativa/remove múltiplos apps de uma vez |
-| `rec` | Aplica Alto Desempenho em todos os apps recomendados pendentes |
-| `busca discord` | Filtra a lista mostrando apenas apps com "discord" no nome |
-| `todos` | Limpa o filtro atual e mostra todos |
-| `sair` | Encerra o script |
+| `1` | Ativa ou remove a preferencia do app numero 1 |
+| `1,3,5` | Ativa ou remove varios apps de uma vez |
+| `rec` | Aplica alto desempenho em todos os recomendados pendentes |
+| `busca discord` | Filtra a lista por nome |
+| `todos` | Limpa o filtro atual |
+| `sair` | Fecha o script |
 
-> **Nota:** Reinicie os aplicativos alterados para que as mudanças entrem em vigor.
+Depois de alterar a preferencia de GPU, reinicie os aplicativos afetados para garantir que o Windows aplique a mudanca.
 
----
+## Gerar Executavel
 
-## Compilar para .exe
-
-Para gerar um executável standalone (não precisa do `.ps1` junto):
+O executavel e opcional. O script PowerShell funciona sozinho.
 
 ```powershell
-# Execute o script de build (instala ps2exe automaticamente se necessário)
 PowerShell -ExecutionPolicy Bypass -File "build\build.ps1"
 ```
 
-O arquivo `SmartGraphicsPreference.exe` será gerado na pasta raiz.
+O build usa o modulo `ps2exe`. Se ele nao estiver instalado, o script tenta instalar automaticamente para o usuario atual.
 
-#### Requisitos do build
+## Como Funciona
 
-- PowerShell com acesso à internet (para baixar o módulo `ps2exe` caso não esteja instalado)
-- Ou instale manualmente: `Install-Module -Name ps2exe -Scope CurrentUser -Force`
+O script grava preferencias em:
 
----
+```text
+HKCU\SOFTWARE\Microsoft\DirectX\UserGpuPreferences
+```
 
-## Como Contribuir
+Ele usa `GpuPreference=2` para alto desempenho, que e o mesmo tipo de configuracao feita pela tela de configuracoes graficas do Windows. A alteracao vale para o usuario atual.
 
-Contribuições são bem-vindas! As formas mais úteis são:
+## Palavras-Chave
 
-### Adicionar apps à base de conhecimento
+PowerShell, Windows, Windows 10, Windows 11, GPU, dedicated GPU, integrated GPU, NVIDIA, AMD Radeon, Intel Arc, graphics settings, GPU preference, per-app GPU preference, UserGpuPreferences, alto desempenho, preferencia grafica.
 
-Edite o dicionário `$appsDB` no início do `SmartGraphicsPreference.ps1`:
+## Contribuir
+
+A forma mais simples de contribuir e adicionar apps conhecidos ao dicionario `$appsDB` em `SmartGraphicsPreference.ps1`.
 
 ```powershell
 $appsDB = @{
-    # Formato: "nome_do_processo" = @{ Cat = "Categoria"; Rec = $true/$false }
     "meuapp" = @{ Cat = "Video"; Rec = $true }
-    ...
 }
 ```
 
-- `Rec = $true` → aparece como `[RECOMENDADO]` (use para apps GPU-intensivos)
-- `Rec = $false` → aparece na lista mas sem destaque
+Use `Rec = $true` para apps que normalmente se beneficiam de GPU dedicada. Use `Rec = $false` para apps que devem aparecer categorizados, mas sem recomendacao automatica.
 
-O nome do processo é o que aparece no Gerenciador de Tarefas, sem `.exe`, em minúsculas.
+## Licenca
 
-### Reportar bugs ou sugerir melhorias
-
-Abra uma [Issue](../../issues) descrevendo o problema ou a sugestão.
-
-### Pull Requests
-
-1. Faça um fork do repositório
-2. Crie uma branch: `git checkout -b minha-melhoria`
-3. Faça as alterações e commit: `git commit -m "feat: adiciona suporte ao app X"`
-4. Envie: `git push origin minha-melhoria`
-5. Abra um Pull Request
-
----
-
-## Licença
-
-MIT © [seu nome]
+MIT. Veja `LICENSE`.
