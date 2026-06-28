@@ -1,76 +1,519 @@
+﻿param(
+    [Parameter(Mandatory=$false)]
+    [string]$Language
+)
+
+# Set UTF-8 output encoding for the console to support Chinese, Japanese, and accented characters
+try {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+} catch {}
+
+
 # ============================================================
 #  SmartGraphicsPreference.ps1 v2.0
-#  Gerenciador Inteligente de Preferencia Grafica
-#  - Filtra ruido de sistema automaticamente
-#  - Base de conhecimento de apps GPU-intensivos
-#  - Monitor de uso real de GPU por processo
-#  - Recomendacoes automaticas destacadas
-#  - Busca, filtro e aplicacao em lote
+#  Interactive Windows GPU Preference Manager
+#  - Filters common system-process noise automatically
+#  - Uses a small knowledge base for GPU-intensive apps
+#  - Shows live GPU usage per process when available
+#  - Highlights recommended apps
+#  - Supports search, filtering, and batch application
+#  - Supports multilingual localization (EN, PT, ES, FR, DE, ZH, JA, IT)
 # ============================================================
 
-# --- BASE DE CONHECIMENTO ---
-$appsDB = @{
-    # Navegadores
-    "chrome"             = @{ Cat = "Navegador";   Rec = $true  }
-    "firefox"            = @{ Cat = "Navegador";   Rec = $true  }
-    "librewolf"          = @{ Cat = "Navegador";   Rec = $true  }
-    "msedge"             = @{ Cat = "Navegador";   Rec = $true  }
-    "opera"              = @{ Cat = "Navegador";   Rec = $true  }
-    "brave"              = @{ Cat = "Navegador";   Rec = $true  }
-    "vivaldi"            = @{ Cat = "Navegador";   Rec = $true  }
-    "thorium"            = @{ Cat = "Navegador";   Rec = $true  }
-    "waterfox"           = @{ Cat = "Navegador";   Rec = $true  }
-    # Video
-    "vlc"                = @{ Cat = "Video";       Rec = $true  }
-    "mpc-hc64"           = @{ Cat = "Video";       Rec = $true  }
-    "mpc-hc"             = @{ Cat = "Video";       Rec = $true  }
-    "mpv"                = @{ Cat = "Video";       Rec = $true  }
-    "wmplayer"           = @{ Cat = "Video";       Rec = $true  }
-    "plex"               = @{ Cat = "Video";       Rec = $true  }
-    # Design / 3D
-    "blender"            = @{ Cat = "3D";          Rec = $true  }
-    "photoshop"          = @{ Cat = "Design";      Rec = $true  }
-    "illustrator"        = @{ Cat = "Design";      Rec = $true  }
-    "krita"              = @{ Cat = "Design";      Rec = $true  }
-    "gimp-2.10"          = @{ Cat = "Design";      Rec = $true  }
-    "gimp"               = @{ Cat = "Design";      Rec = $true  }
-    "inkscape"           = @{ Cat = "Design";      Rec = $true  }
-    "figma"              = @{ Cat = "Design";      Rec = $true  }
-    # Edicao de Video
-    "premiere"           = @{ Cat = "Edicao";      Rec = $true  }
-    "afterfx"            = @{ Cat = "Edicao";      Rec = $true  }
-    "resolve"            = @{ Cat = "Edicao";      Rec = $true  }
-    "fusion"             = @{ Cat = "Edicao";      Rec = $true  }
-    "vegas130"           = @{ Cat = "Edicao";      Rec = $true  }
-    "kdenlive"           = @{ Cat = "Edicao";      Rec = $true  }
-    "handbrake"          = @{ Cat = "Edicao";      Rec = $true  }
-    # Streaming
-    "obs64"              = @{ Cat = "Streaming";   Rec = $true  }
-    "obs32"              = @{ Cat = "Streaming";   Rec = $true  }
-    "streamlabsobs"      = @{ Cat = "Streaming";   Rec = $true  }
-    # Games / Launchers
-    "steam"              = @{ Cat = "Games";       Rec = $true  }
-    "epicgameslauncher"  = @{ Cat = "Games";       Rec = $true  }
-    "leagueclient"       = @{ Cat = "Games";       Rec = $true  }
-    "riotclient"         = @{ Cat = "Games";       Rec = $true  }
-    "battlenet"          = @{ Cat = "Games";       Rec = $true  }
-    "goggalaxy"          = @{ Cat = "Games";       Rec = $true  }
-    "gameoverlayui"      = @{ Cat = "Games";       Rec = $true  }
-    # Comunicacao com GPU
-    "discord"            = @{ Cat = "Comunicacao"; Rec = $true  }
-    "zoom"               = @{ Cat = "Comunicacao"; Rec = $true  }
-    "teams"              = @{ Cat = "Comunicacao"; Rec = $false }
-    "slack"              = @{ Cat = "Comunicacao"; Rec = $false }
-    # Dev (normalmente nao precisa)
-    "code"               = @{ Cat = "Dev";         Rec = $false }
-    "devenv"             = @{ Cat = "Dev";         Rec = $false }
-    "rider64"            = @{ Cat = "Dev";         Rec = $false }
-    "webstorm64"         = @{ Cat = "Dev";         Rec = $false }
-    "pycharm64"          = @{ Cat = "Dev";         Rec = $false }
+# --- LOCALIZATION STRINGS ---
+$translations = @{
+    "en" = @{
+        Title            = "Windows GPU Preference Manager"
+        HighPerf         = "High Performance"
+        ReadingUsage     = "Reading GPU usage..."
+        ColNum           = "#"
+        ColApp           = "App"
+        ColCategory      = "Category"
+        ColGpu           = "GPU%"
+        ColStatus        = "Status"
+        StatusHigh       = "[OK] High Performance"
+        StatusRec        = "[RECOMMENDED]"
+        CatBrowser       = "Browser"
+        CatVideo         = "Video"
+        Cat3D            = "3D"
+        CatDesign        = "Design"
+        CatVideoEdit     = "Video Edit"
+        CatStreaming     = "Streaming"
+        CatGames         = "Games"
+        CatCommunication = "Communication"
+        CatDeveloper     = "Developer"
+        CatOther         = "Other"
+        NoAppsFound      = "No apps found{0}."
+        ForFilter        = " for '{0}'"
+        CommandsHeader   = "Commands:"
+        CmdToggle        = "Toggle high-performance preference"
+        CmdRecApply      = "Apply all recommended apps ({0} pending)"
+        CmdSearch        = "Filter list"
+        CmdAll           = "Clear filter"
+        CmdQuit          = "Close"
+        SummaryInfo      = "Summary: {0} configured, {1} recommended pending"
+        FilterInfo       = "Filter: '{0}'"
+        AllConfigured    = "All recommended apps are already configured."
+        AppsConfigured   = "{0} app(s) configured successfully."
+        PressEnter       = "[Press Enter to continue]"
+        NumNotFound      = "[!] Number {0} was not found."
+        DoneMessage      = "Done. Restart changed apps so Windows can apply the new preference."
+        SuccessAdd       = "  [+] {0} --> High Performance"
+        SuccessRemove    = "  [-] {0} --> Removed (Windows default)"
+        CommandKeywords  = @{
+            Quit   = "quit"
+            All    = "all"
+            Search = "search"
+            Rec    = "rec"
+            Apply  = "apply"
+        }
+    }
+    "pt" = @{
+        Title            = "Gerenciador de Preferência de GPU do Windows"
+        HighPerf         = "Alto Desempenho"
+        ReadingUsage     = "Lendo uso de GPU..."
+        ColNum           = "#"
+        ColApp           = "App"
+        ColCategory      = "Categoria"
+        ColGpu           = "GPU%"
+        ColStatus        = "Status"
+        StatusHigh       = "[OK] Alto Desempenho"
+        StatusRec        = "[RECOMENDADO]"
+        CatBrowser       = "Navegador"
+        CatVideo         = "Vídeo"
+        Cat3D            = "3D"
+        CatDesign        = "Design"
+        CatVideoEdit     = "Edição de Vídeo"
+        CatStreaming     = "Streaming"
+        CatGames         = "Jogos"
+        CatCommunication = "Comunicação"
+        CatDeveloper     = "Desenvolvedor"
+        CatOther         = "Outro"
+        NoAppsFound      = "Nenhum app encontrado{0}."
+        ForFilter        = " para '{0}'"
+        CommandsHeader   = "Comandos:"
+        CmdToggle        = "Alternar preferência de alto desempenho"
+        CmdRecApply      = "Aplicar todos os recomendados ({0} pendentes)"
+        CmdSearch        = "Filtrar lista"
+        CmdAll           = "Limpar filtro"
+        CmdQuit          = "Fechar"
+        SummaryInfo      = "Resumo: {0} configurado(s), {1} recomendado(s) pendente(s)"
+        FilterInfo       = "Filtro: '{0}'"
+        AllConfigured    = "Todos os apps recomendados já estão configurados."
+        AppsConfigured   = "{0} app(s) configurado(s) com sucesso."
+        PressEnter       = "[Pressione Enter para continuar]"
+        NumNotFound      = "[!] Número {0} não foi encontrado."
+        DoneMessage      = "Concluído. Reinicie os apps alterados para que o Windows aplique a nova preferência."
+        SuccessAdd       = "  [+] {0} --> Alto Desempenho"
+        SuccessRemove    = "  [-] {0} --> Removido (Padrão do Windows)"
+        CommandKeywords  = @{
+            Quit   = "sair"
+            All    = "todos"
+            Search = "busca"
+            Rec    = "rec"
+            Apply  = "aplicar"
+        }
+    }
+    "es" = @{
+        Title            = "Administrador de Preferencias de GPU de Windows"
+        HighPerf         = "Alto Rendimiento"
+        ReadingUsage     = "Leyendo uso de GPU..."
+        ColNum           = "#"
+        ColApp           = "App"
+        ColCategory      = "Categoría"
+        ColGpu           = "GPU%"
+        ColStatus        = "Estado"
+        StatusHigh       = "[OK] Alto Rendimiento"
+        StatusRec        = "[RECOMENDADO]"
+        CatBrowser       = "Navegador"
+        CatVideo         = "Vídeo"
+        Cat3D            = "3D"
+        CatDesign        = "Diseño"
+        CatVideoEdit     = "Edición de Vídeo"
+        CatStreaming     = "Streaming"
+        CatGames         = "Juegos"
+        CatCommunication = "Comunicación"
+        CatDeveloper     = "Desarrollador"
+        CatOther         = "Otro"
+        NoAppsFound      = "No se encontraron aplicaciones{0}."
+        ForFilter        = " para '{0}'"
+        CommandsHeader   = "Comandos:"
+        CmdToggle        = "Alternar preferencia de alto rendimiento"
+        CmdRecApply      = "Aplicar todos los recomendados ({0} pendientes)"
+        CmdSearch        = "Filtrar lista"
+        CmdAll           = "Limpar filtro"
+        CmdQuit          = "Salir"
+        SummaryInfo      = "Resumen: {0} configurado(s), {1} recomendado(s) pendiente(s)"
+        FilterInfo       = "Filtro: '{0}'"
+        AllConfigured    = "Todas las aplicaciones recomendadas ya están configuradas."
+        AppsConfigured   = "{0} aplicación(es) configurada(s) con éxito."
+        PressEnter       = "[Presione Enter para continuar]"
+        NumNotFound      = "[!] El número {0} no fue encontrado."
+        DoneMessage      = "Hecho. Reinicie las aplicaciones cambiadas para que Windows aplique la nueva preferencia."
+        SuccessAdd       = "  [+] {0} --> Alto Rendimiento"
+        SuccessRemove    = "  [-] {0} --> Eliminado (Predeterminado de Windows)"
+        CommandKeywords  = @{
+            Quit   = "salir"
+            All    = "todos"
+            Search = "buscar"
+            Rec    = "rec"
+            Apply  = "aplicar"
+        }
+    }
+    "fr" = @{
+        Title            = "Gestionnaire de Préférences GPU Windows"
+        HighPerf         = "Performances Élevées"
+        ReadingUsage     = "Lecture de l'utilisation du GPU..."
+        ColNum           = "#"
+        ColApp           = "App"
+        ColCategory      = "Catégorie"
+        ColGpu           = "GPU%"
+        ColStatus        = "Statut"
+        StatusHigh       = "[OK] Performances Élevées"
+        StatusRec        = "[RECOMMANDÉ]"
+        CatBrowser       = "Navigateur"
+        CatVideo         = "Vidéo"
+        Cat3D            = "3D"
+        CatDesign        = "Design"
+        CatVideoEdit     = "Montage Vidéo"
+        CatStreaming     = "Streaming"
+        CatGames         = "Jeux"
+        CatCommunication = "Communication"
+        CatDeveloper     = "Développeur"
+        CatOther         = "Autre"
+        NoAppsFound      = "Aucune application trouvée{0}."
+        ForFilter        = " pour '{0}'"
+        CommandsHeader   = "Commandes :"
+        CmdToggle        = "Basculer la préférence de performances élevées"
+        CmdRecApply      = "Appliquer toutes les applications recommandées ({0} en attente)"
+        CmdSearch        = "Filtrer la liste"
+        CmdAll           = "Effacer le filtre"
+        CmdQuit          = "Quitter"
+        SummaryInfo      = "Résumé : {0} configurée(s), {1} recommandée(s) en attente"
+        FilterInfo       = "Filtre : '{0}'"
+        AllConfigured    = "Toutes les applications recommandées sont déjà configurées."
+        AppsConfigured   = "{0} application(s) configurée(s) avec succès."
+        PressEnter       = "[Appuyez sur Entrée pour continuer]"
+        NumNotFound      = "[!] Le numéro {0} n'a pas été trouvé."
+        DoneMessage      = "Terminé. Redémarrez les applications modifiées pour que Windows applique la nouvelle préférence."
+        SuccessAdd       = "  [+] {0} --> Performances Élevées"
+        SuccessRemove    = "  [-] {0} --> Supprimé (Par défaut de Windows)"
+        CommandKeywords  = @{
+            Quit   = "quitter"
+            All    = "tout"
+            Search = "recherche"
+            Rec    = "rec"
+            Apply  = "appliquer"
+        }
+    }
+    "de" = @{
+        Title            = "Windows GPU-Präferenz-Manager"
+        HighPerf         = "Hohe Leistung"
+        ReadingUsage     = "GPU-Auslastung wird gelesen..."
+        ColNum           = "#"
+        ColApp           = "App"
+        ColCategory      = "Kategorie"
+        ColGpu           = "GPU%"
+        ColStatus        = "Status"
+        StatusHigh       = "[OK] Hohe Leistung"
+        StatusRec        = "[EMPFOHLEN]"
+        CatBrowser       = "Browser"
+        CatVideo         = "Video"
+        Cat3D            = "3D"
+        CatDesign        = "Design"
+        CatVideoEdit     = "Videobearbeitung"
+        CatStreaming     = "Streaming"
+        CatGames         = "Spiele"
+        CatCommunication = "Kommunikation"
+        CatDeveloper     = "Entwickler"
+        CatOther         = "Andere"
+        NoAppsFound      = "Keine Apps gefunden{0}."
+        ForFilter        = " für '{0}'"
+        CommandsHeader   = "Befehle:"
+        CmdToggle        = "Hohe Leistungspräferenz umschalten"
+        CmdRecApply      = "Alle empfohlenen Apps anwenden ({0} ausstehend)"
+        CmdSearch        = "Liste filtern"
+        CmdAll           = "Filter löschen"
+        CmdQuit          = "Beenden"
+        SummaryInfo      = "Zusammenfassung: {0} konfiguriert, {1} empfohlen ausstehend"
+        FilterInfo       = "Filter: '{0}'"
+        AllConfigured    = "Alle empfohlenen Apps sind bereits konfiguriert."
+        AppsConfigured   = "{0} App(s) erfolgreich konfiguriert."
+        PressEnter       = "[Eingabetaste drücken, um fortzufahren]"
+        NumNotFound      = "[!] Nummer {0} wurde nicht gefunden."
+        DoneMessage      = "Fertig. Starten Sie geänderte Apps neu, damit Windows die neue Präferenz übernehmen kann."
+        SuccessAdd       = "  [+] {0} --> Hohe Leistung"
+        SuccessRemove    = "  [-] {0} --> Entfernt (Windows-Standard)"
+        CommandKeywords  = @{
+            Quit   = "beenden"
+            All    = "alle"
+            Search = "suche"
+            Rec    = "rec"
+            Apply  = "anwenden"
+        }
+    }
+    "zh" = @{
+        Title            = "Windows GPU 首选项管理器"
+        HighPerf         = "高性能"
+        ReadingUsage     = "正在读取 GPU 使用率..."
+        ColNum           = "#"
+        ColApp           = "应用"
+        ColCategory      = "类别"
+        ColGpu           = "GPU%"
+        ColStatus        = "状态"
+        StatusHigh       = "[OK] 高性能"
+        StatusRec        = "[推荐]"
+        CatBrowser       = "浏览器"
+        CatVideo         = "视频"
+        Cat3D            = "3D"
+        CatDesign        = "设计"
+        CatVideoEdit     = "视频编辑"
+        CatStreaming     = "串流"
+        CatGames         = "游戏"
+        CatCommunication = "通讯"
+        CatDeveloper     = "开发者"
+        CatOther         = "其他"
+        NoAppsFound      = "未找到应用{0}。"
+        ForFilter        = " 针对 '{0}'"
+        CommandsHeader   = "命令:"
+        CmdToggle        = "切换高性能首选项"
+        CmdRecApply      = "应用所有推荐的应用（{0} 个待处理）"
+        CmdSearch        = "过滤列表"
+        CmdAll           = "清除过滤器"
+        CmdQuit          = "关闭"
+        SummaryInfo      = "摘要: {0} 已配置, {1} 个推荐待处理"
+        FilterInfo       = "过滤器: '{0}'"
+        AllConfigured    = "所有推荐的应用都已配置。"
+        AppsConfigured   = "{0} 个应用配置成功。"
+        PressEnter       = "[按回车键继续]"
+        NumNotFound      = "[!] 未找到数字 {0}。"
+        DoneMessage      = "完成。请重启更改的应用，以便 Windows 应用新的首选项。"
+        SuccessAdd       = "  [+] {0} --> 高性能"
+        SuccessRemove    = "  [-] {0} --> 已移除 (Windows 默认)"
+        CommandKeywords  = @{
+            Quit   = "quit"
+            All    = "all"
+            Search = "search"
+            Rec    = "rec"
+            Apply  = "apply"
+        }
+    }
+    "ja" = @{
+        Title            = "Windows GPU グラフィックス仕様マネージャー"
+        HighPerf         = "高パフォーマンス"
+        ReadingUsage     = "GPU 使用状況を読み込み中..."
+        ColNum           = "#"
+        ColApp           = "アプリ"
+        ColCategory      = "カテゴリ"
+        ColGpu           = "GPU%"
+        ColStatus        = "ステータス"
+        StatusHigh       = "[OK] 高パフォーマンス"
+        StatusRec        = "[推奨]"
+        CatBrowser       = "ブラウザ"
+        CatVideo         = "ビデオ"
+        Cat3D            = "3D"
+        CatDesign        = "デザイン"
+        CatVideoEdit     = "動画編集"
+        CatStreaming     = "ストリーミング"
+        CatGames         = "ゲーム"
+        CatCommunication = "コミュニケーション"
+        CatDeveloper     = "開発者"
+        CatOther         = "その他"
+        NoAppsFound      = "アプリが見つかりません{0}。"
+        ForFilter        = " 検索: '{0}'"
+        CommandsHeader   = "コマンド:"
+        CmdToggle        = "高パフォーマンス設定 of 切り替え"
+        CmdRecApply      = "すべての推奨アプリを適用 ({0} 件保留中)"
+        CmdSearch        = "リストを絞り込む"
+        CmdAll           = "フィルターをクリア"
+        CmdQuit          = "終了"
+        SummaryInfo      = "概要: {0} 件設定済み、{1} 件の推奨アプリが保留中"
+        FilterInfo       = "フィルター: '{0}'"
+        AllConfigured    = "すべての推奨アプリはすでに設定されています。"
+        AppsConfigured   = "{0} 件のアプリが正常に設定されました。"
+        PressEnter       = "[Enterキーを押して続行]"
+        NumNotFound      = "[!] 番号 {0} は見つかりませんでした。"
+        DoneMessage      = "完了。設定を有効にするには、変更したアプリを再起動してください。"
+        SuccessAdd       = "  [+] {0} --> 高パフォーマンス"
+        SuccessRemove    = "  [-] {0} --> 削除 (Windows の既定値)"
+        CommandKeywords  = @{
+            Quit   = "quit"
+            All    = "all"
+            Search = "search"
+            Rec    = "rec"
+            Apply  = "apply"
+        }
+    }
+    "it" = @{
+        Title            = "Gestore delle Preferenze GPU di Windows"
+        HighPerf         = "Prestazioni Elevate"
+        ReadingUsage     = "Lettura dell'utilizzo della GPU..."
+        ColNum           = "#"
+        ColApp           = "App"
+        ColCategory      = "Categoria"
+        ColGpu           = "GPU%"
+        ColStatus        = "Stato"
+        StatusHigh       = "[OK] Prestazioni Elevate"
+        StatusRec        = "[CONSIGLIATO]"
+        CatBrowser       = "Browser"
+        CatVideo         = "Video"
+        Cat3D            = "3D"
+        CatDesign        = "Design"
+        CatVideoEdit     = "Montaggio Video"
+        CatStreaming     = "Streaming"
+        CatGames         = "Giochi"
+        CatCommunication = "Comunicazione"
+        CatDeveloper     = "Sviluppatore"
+        CatOther         = "Altro"
+        NoAppsFound      = "Nessuna applicazione trovata{0}."
+        ForFilter        = " per '{0}'"
+        CommandsHeader   = "Comandi:"
+        CmdToggle        = "Attiva/disattiva preferenza prestazioni elevate"
+        CmdRecApply      = "Applica tutte le app consigliate ({0} in attesa)"
+        CmdSearch        = "Filtra elenco"
+        CmdAll           = "Cancella filtro"
+        CmdQuit          = "Chiudi"
+        SummaryInfo      = "Riepilogo: {0} configurate, {1} consigliate in attesa"
+        FilterInfo       = "Filtro: '{0}'"
+        AllConfigured    = "Tutte le app consigliate sono già configurate."
+        AppsConfigured   = "{0} applicazione/i configurata/e con successo."
+        PressEnter       = "[Premi Invio per continuare]"
+        NumNotFound      = "[!] Il numero {0} non è stato trovato."
+        DoneMessage      = "Fatto. Riavvia le app modificate affinché Windows applichi la nuova preferenza."
+        SuccessAdd       = "  [+] {0} --> Prestazioni Elevate"
+        SuccessRemove    = "  [-] {0} --> Rimosso (Predefinito di Windows)"
+        CommandKeywords  = @{
+            Quit   = "esci"
+            All    = "tutti"
+            Search = "cerca"
+            Rec    = "rec"
+            Apply  = "applica"
+        }
+    }
 }
 
-# Processos de sistema que nao aparecem na lista
-$sistemaNomes = [System.Collections.Generic.HashSet[string]]::new(
+# --- AUTOMATIC SYSTEM LANGUAGE DETECTION ---
+$systemLang = "en"
+try {
+    $uiCulture = [System.Globalization.CultureInfo]::CurrentUICulture.Name
+    if ($uiCulture -like "pt*") { $systemLang = "pt" }
+    elseif ($uiCulture -like "es*") { $systemLang = "es" }
+    elseif ($uiCulture -like "fr*") { $systemLang = "fr" }
+    elseif ($uiCulture -like "de*") { $systemLang = "de" }
+    elseif ($uiCulture -like "zh*") { $systemLang = "zh" }
+    elseif ($uiCulture -like "ja*") { $systemLang = "ja" }
+    elseif ($uiCulture -like "it*") { $systemLang = "it" }
+} catch {}
+
+$langNames = @{
+    "en" = "English"
+    "pt" = "Português"
+    "es" = "Español"
+    "fr" = "Français"
+    "de" = "Deutsch"
+    "zh" = "简体中文"
+    "ja" = "日本語"
+    "it" = "Italiano"
+}
+
+$defaultLangName = $langNames[$systemLang]
+
+# Prompt user for language choice if parameter not passed
+if (-not $Language) {
+    Clear-Host
+    Write-Host ""
+    Write-Host "  Select language / Selecione o idioma / Seleccione el idioma:" -ForegroundColor Cyan
+    Write-Host "  ===========================================================" -ForegroundColor Cyan
+    Write-Host "    [1] English       [2] Português      [3] Español"
+    Write-Host "    [4] Français      [5] Deutsch        [6] 简体中文"
+    Write-Host "    [7] 日本語        [8] Italiano"
+    Write-Host ""
+    Write-Host "  Press Enter to auto-detect (Default: $defaultLangName)" -ForegroundColor DarkGray
+    Write-Host ""
+    $choice = Read-Host "  Language [1-8]"
+    $choice = $choice.Trim()
+    
+    if ($choice -eq "1") { $Language = "en" }
+    elseif ($choice -eq "2") { $Language = "pt" }
+    elseif ($choice -eq "3") { $Language = "es" }
+    elseif ($choice -eq "4") { $Language = "fr" }
+    elseif ($choice -eq "5") { $Language = "de" }
+    elseif ($choice -eq "6") { $Language = "zh" }
+    elseif ($choice -eq "7") { $Language = "ja" }
+    elseif ($choice -eq "8") { $Language = "it" }
+    else { $Language = $systemLang }
+} else {
+    $Language = $Language.ToLower()
+    if (-not $translations.ContainsKey($Language)) {
+        $Language = "en"
+    }
+}
+
+$txt = $translations[$Language]
+
+# --- APP KNOWLEDGE BASE ---
+$appDatabase = @{
+    # Browsers
+    "chrome"             = @{ Category = "Browser";       Recommended = $true  }
+    "firefox"            = @{ Category = "Browser";       Recommended = $true  }
+    "librewolf"          = @{ Category = "Browser";       Recommended = $true  }
+    "msedge"             = @{ Category = "Browser";       Recommended = $true  }
+    "opera"              = @{ Category = "Browser";       Recommended = $true  }
+    "brave"              = @{ Category = "Browser";       Recommended = $true  }
+    "vivaldi"            = @{ Category = "Browser";       Recommended = $true  }
+    "thorium"            = @{ Category = "Browser";       Recommended = $true  }
+    "waterfox"           = @{ Category = "Browser";       Recommended = $true  }
+    # Video
+    "vlc"                = @{ Category = "Video";         Recommended = $true  }
+    "mpc-hc64"           = @{ Category = "Video";         Recommended = $true  }
+    "mpc-hc"             = @{ Category = "Video";         Recommended = $true  }
+    "mpv"                = @{ Category = "Video";         Recommended = $true  }
+    "wmplayer"           = @{ Category = "Video";         Recommended = $true  }
+    "plex"               = @{ Category = "Video";         Recommended = $true  }
+    # Design / 3D
+    "blender"            = @{ Category = "3D";            Recommended = $true  }
+    "photoshop"          = @{ Category = "Design";        Recommended = $true  }
+    "illustrator"        = @{ Category = "Design";        Recommended = $true  }
+    "krita"              = @{ Category = "Design";        Recommended = $true  }
+    "gimp-2.10"          = @{ Category = "Design";        Recommended = $true  }
+    "gimp"               = @{ Category = "Design";        Recommended = $true  }
+    "inkscape"           = @{ Category = "Design";        Recommended = $true  }
+    "figma"              = @{ Category = "Design";        Recommended = $true  }
+    # Video editing
+    "premiere"           = @{ Category = "Video Edit";    Recommended = $true  }
+    "afterfx"            = @{ Category = "Video Edit";    Recommended = $true  }
+    "resolve"            = @{ Category = "Video Edit";    Recommended = $true  }
+    "fusion"             = @{ Category = "Video Edit";    Recommended = $true  }
+    "vegas130"           = @{ Category = "Video Edit";    Recommended = $true  }
+    "kdenlive"           = @{ Category = "Video Edit";    Recommended = $true  }
+    "handbrake"          = @{ Category = "Video Edit";    Recommended = $true  }
+    # Streaming
+    "obs64"              = @{ Category = "Streaming";     Recommended = $true  }
+    "obs32"              = @{ Category = "Streaming";     Recommended = $true  }
+    "streamlabsobs"      = @{ Category = "Streaming";     Recommended = $true  }
+    # Games / launchers
+    "steam"              = @{ Category = "Games";         Recommended = $true  }
+    "epicgameslauncher"  = @{ Category = "Games";         Recommended = $true  }
+    "leagueclient"       = @{ Category = "Games";         Recommended = $true  }
+    "riotclient"         = @{ Category = "Games";         Recommended = $true  }
+    "battlenet"          = @{ Category = "Games";         Recommended = $true  }
+    "goggalaxy"          = @{ Category = "Games";         Recommended = $true  }
+    "gameoverlayui"      = @{ Category = "Games";         Recommended = $true  }
+    # Communication apps with GPU acceleration
+    "discord"            = @{ Category = "Communication"; Recommended = $true  }
+    "zoom"               = @{ Category = "Communication"; Recommended = $true  }
+    "teams"              = @{ Category = "Communication"; Recommended = $false }
+    "slack"              = @{ Category = "Communication"; Recommended = $false }
+    # Developer tools, usually not recommended by default
+    "code"               = @{ Category = "Developer";     Recommended = $false }
+    "devenv"             = @{ Category = "Developer";     Recommended = $false }
+    "rider64"            = @{ Category = "Developer";     Recommended = $false }
+    "webstorm64"         = @{ Category = "Developer";     Recommended = $false }
+    "pycharm64"          = @{ Category = "Developer";     Recommended = $false }
+}
+
+# System processes hidden from the interactive list
+$systemProcessNames = [System.Collections.Generic.HashSet[string]]::new(
     [string[]]@(
         "svchost","csrss","winlogon","wininit","services","lsass","spoolsv",
         "taskhost","taskhostw","dwm","conhost","sihost","fontdrvhost",
@@ -85,167 +528,209 @@ $sistemaNomes = [System.Collections.Generic.HashSet[string]]::new(
     [System.StringComparer]::OrdinalIgnoreCase
 )
 
-$chaveReg   = "HKCU:\SOFTWARE\Microsoft\DirectX\UserGpuPreferences"
-$ALTO       = 2
+$gpuPreferenceKey = "HKCU:\SOFTWARE\Microsoft\DirectX\UserGpuPreferences"
+$highPerformancePreference = 2
 
-if (-not (Test-Path $chaveReg)) { New-Item -Path $chaveReg -Force | Out-Null }
+if (-not (Test-Path $gpuPreferenceKey)) {
+    New-Item -Path $gpuPreferenceKey -Force | Out-Null
+}
 
-# ---- FUNCOES ----
+# ---- FUNCTIONS ----
 
-function Get-GpuStatus($path) {
+function Get-GpuPreferenceStatus($path) {
     try {
-        $v = (Get-ItemProperty -Path $chaveReg -Name $path -ErrorAction Stop).$path
-        if ($v -match "GpuPreference=2") { return "alto" }
-        if ($v -match "GpuPreference=1") { return "economia" }
-        if ($v -match "GpuPreference=0") { return "padrao" }
+        $value = (Get-ItemProperty -Path $gpuPreferenceKey -Name $path -ErrorAction Stop).$path
+        if ($value -match "GpuPreference=2") { return "high" }
+        if ($value -match "GpuPreference=1") { return "power-saving" }
+        if ($value -match "GpuPreference=0") { return "default" }
     } catch {}
-    return "nenhum"
+    return "none"
 }
 
 function Get-GpuUsage() {
-    $uso = @{}
+    $usageByPid = @{}
     try {
         $counters = Get-Counter "\GPU Engine(*engtype_3D*)\Utilization Percentage" `
             -SampleInterval 1 -MaxSamples 1 -ErrorAction Stop
-        foreach ($s in $counters.CounterSamples) {
-            if ($s.CookedValue -gt 0 -and $s.InstanceName -match "pid_(\d+)") {
+        foreach ($sample in $counters.CounterSamples) {
+            if ($sample.CookedValue -gt 0 -and $sample.InstanceName -match "pid_(\d+)") {
                 $pid = [int]$Matches[1]
-                $pct = [math]::Round($s.CookedValue, 0)
-                if (-not $uso.ContainsKey($pid) -or $uso[$pid] -lt $pct) {
-                    $uso[$pid] = $pct
+                $percent = [math]::Round($sample.CookedValue, 0)
+                if (-not $usageByPid.ContainsKey($pid) -or $usageByPid[$pid] -lt $percent) {
+                    $usageByPid[$pid] = $percent
                 }
             }
         }
     } catch {}
-    return $uso
+    return $usageByPid
 }
 
-function Get-Processos($filtro = "") {
-    $lista = Get-Process |
-        Where-Object { $_.Path -and -not $sistemaNomes.Contains($_.Name) } |
+function Get-AppProcesses($filter = "") {
+    $processes = Get-Process |
+        Where-Object { $_.Path -and -not $systemProcessNames.Contains($_.Name) } |
         Group-Object Path |
         ForEach-Object { $_.Group | Sort-Object Id | Select-Object -First 1 } |
         Sort-Object Name
-    if ($filtro) { $lista = $lista | Where-Object { $_.Name -like "*$filtro*" } }
-    return $lista
+    if ($filter) {
+        $processes = $processes | Where-Object { $_.Name -like "*$filter*" }
+    }
+    return $processes
 }
 
-function Set-Alto($path, $nome) {
-    Set-ItemProperty -Path $chaveReg -Name $path -Value "GpuPreference=$ALTO;" -Force
-    Write-Host "  [+] $nome --> Alto Desempenho" -ForegroundColor Green
+function Set-HighPerformancePreference($path, $name) {
+    Set-ItemProperty -Path $gpuPreferenceKey -Name $path -Value "GpuPreference=$highPerformancePreference;" -Force
+    Write-Host ($txt.SuccessAdd -f $name) -ForegroundColor Green
 }
 
-function Remove-Alto($path, $nome) {
-    Remove-ItemProperty -Path $chaveReg -Name $path -ErrorAction SilentlyContinue
-    Write-Host "  [-] $nome --> Removido (padrao do sistema)" -ForegroundColor DarkYellow
+function Remove-GpuPreference($path, $name) {
+    Remove-ItemProperty -Path $gpuPreferenceKey -Name $path -ErrorAction SilentlyContinue
+    Write-Host ($txt.SuccessRemove -f $name) -ForegroundColor DarkYellow
 }
 
-# ---- LOOP PRINCIPAL ----
+# ---- MAIN LOOP ----
 
-$filtroAtual = ""
+$currentFilter = ""
+
+# Category mapper based on selected language
+$catMap = @{
+    "Browser"       = $txt.CatBrowser
+    "Video"         = $txt.CatVideo
+    "3D"            = $txt.Cat3D
+    "Design"        = $txt.CatDesign
+    "Video Edit"    = $txt.CatVideoEdit
+    "Streaming"     = $txt.CatStreaming
+    "Games"         = $txt.CatGames
+    "Communication" = $txt.CatCommunication
+    "Developer"     = $txt.CatDeveloper
+    "Other"         = $txt.CatOther
+}
 
 while ($true) {
     Clear-Host
 
     Write-Host ""
     Write-Host "  =====================================================" -ForegroundColor Cyan
-    Write-Host "    Preferencia Grafica Inteligente   [Alto Desempenho]" -ForegroundColor Cyan
+    Write-Host "    $($txt.Title)   [$($txt.HighPerf)]" -ForegroundColor Cyan
     Write-Host "  =====================================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  Lendo GPU..." -NoNewline -ForegroundColor DarkGray
-    $gpuUso = Get-GpuUsage
-    Write-Host "`r               `r" -NoNewline
+    Write-Host "  $($txt.ReadingUsage)" -NoNewline -ForegroundColor DarkGray
+    $gpuUsage = Get-GpuUsage
+    Write-Host "`r                    `r" -NoNewline
 
-    $processos = Get-Processos $filtroAtual
-    $mapa = @{}
+    $processes = Get-AppProcesses $currentFilter
+    $indexMap = @{}
 
-    if ($processos.Count -eq 0) {
-        Write-Host "  Nenhum app encontrado$(if ($filtroAtual) { " para '$filtroAtual'" })." -ForegroundColor Yellow
+    if ($processes.Count -eq 0) {
+        $filterMsg = if ($currentFilter) { $txt.ForFilter -f $currentFilter } else { "" }
+        Write-Host "  $($txt.NoAppsFound -f $filterMsg)" -ForegroundColor Yellow
     } else {
-        Write-Host ("  {0,-4} {1,-26} {2,-12} {3,-6} {4}" -f "#", "App", "Categoria", "GPU%", "Status") -ForegroundColor DarkGray
-        Write-Host ("  " + [string]::new('-', 64)) -ForegroundColor DarkGray
+        Write-Host ("  {0,-4} {1,-26} {2,-14} {3,-6} {4}" -f $txt.ColNum, $txt.ColApp, $txt.ColCategory, $txt.ColGpu, $txt.ColStatus) -ForegroundColor DarkGray
+        Write-Host ("  " + [string]::new('-', 68)) -ForegroundColor DarkGray
 
-        $i = 1
-        foreach ($p in $processos) {
-            $db     = $appsDB[$p.Name.ToLower()]
-            $cat    = if ($db) { $db.Cat } else { "Outro" }
-            $rec    = if ($db) { $db.Rec } else { $false }
-            $status = Get-GpuStatus $p.Path
-            $gpuPct = if ($gpuUso.ContainsKey($p.Id)) { "$($gpuUso[$p.Id])%" } else { "" }
+        $index = 1
+        foreach ($process in $processes) {
+            $appInfo = $appDatabase[$process.Name.ToLower()]
+            $categoryKey = if ($appInfo) { $appInfo.Category } else { "Other" }
+            $category = if ($catMap.ContainsKey($categoryKey)) { $catMap[$categoryKey] } else { $categoryKey }
+            $recommended = if ($appInfo) { $appInfo.Recommended } else { $false }
+            $status = Get-GpuPreferenceStatus $process.Path
+            $gpuPercent = if ($gpuUsage.ContainsKey($process.Id)) { "$($gpuUsage[$process.Id])%" } else { "" }
 
-            # Prioridade de cor: verde = configurado, amarelo = recomendado, cinza = outro
-            if ($status -eq "alto") {
-                $cor = "Green";  $tag = "[OK] Alto Desempenho"
-            } elseif ($rec) {
-                $cor = "Yellow"; $tag = "[RECOMENDADO]"
-            } elseif ($cat -eq "Outro") {
-                $cor = "DarkGray"; $tag = ""
+            # Color priority: green = configured, yellow = recommended, gray = uncategorized.
+            if ($status -eq "high") {
+                $color = "Green";  $tag = $txt.StatusHigh
+            } elseif ($recommended) {
+                $color = "Yellow"; $tag = $txt.StatusRec
+            } elseif ($categoryKey -eq "Other") {
+                $color = "DarkGray"; $tag = ""
             } else {
-                $cor = "White";  $tag = ""
+                $color = "White";  $tag = ""
             }
 
-            Write-Host ("  {0,-4} {1,-26} {2,-12} {3,-6} {4}" -f $i, $p.Name, $cat, $gpuPct, $tag) -ForegroundColor $cor
-            $mapa[$i] = @{ Proc = $p; Rec = $rec; Status = $status; Cat = $cat }
-            $i++
+            Write-Host ("  {0,-4} {1,-26} {2,-14} {3,-6} {4}" -f $index, $process.Name, $category, $gpuPercent, $tag) -ForegroundColor $color
+            $indexMap[$index] = @{ Process = $process; Recommended = $recommended; Status = $status; Category = $category }
+            $index++
         }
     }
 
-    # Legenda
-    $totalRec = ($mapa.Values | Where-Object { $_.Rec -and $_.Status -ne "alto" }).Count
-    $totalOk  = ($mapa.Values | Where-Object { $_.Status -eq "alto" }).Count
+    $pendingRecommendedCount = ($indexMap.Values | Where-Object { $_.Recommended -and $_.Status -ne "high" }).Count
+    $configuredCount = ($indexMap.Values | Where-Object { $_.Status -eq "high" }).Count
     Write-Host ""
-    Write-Host ("  " + [string]::new('-', 64)) -ForegroundColor DarkGray
-    Write-Host "  Comandos:" -ForegroundColor DarkGray
-    Write-Host "    1 / 1,3,5    Ativar ou remover (toggle)"        -ForegroundColor DarkGray
-    Write-Host "    rec          Aplicar TODOS os recomendados ($totalRec pendentes)" -ForegroundColor DarkGray
-    Write-Host "    busca <x>    Filtrar lista (ex: busca discord)" -ForegroundColor DarkGray
-    Write-Host "    todos        Limpar filtro"                      -ForegroundColor DarkGray
-    Write-Host "    sair         Fechar"                             -ForegroundColor DarkGray
+    Write-Host ("  " + [string]::new('-', 68)) -ForegroundColor DarkGray
+
+    # Display Commands with Localized Info
+    $cmdRecKey = $txt.CommandKeywords.Rec
+    $cmdSearchKey = $txt.CommandKeywords.Search
+    $cmdAllKey = $txt.CommandKeywords.All
+    $cmdQuitKey = $txt.CommandKeywords.Quit
+
+    Write-Host "  $($txt.CommandsHeader)" -ForegroundColor DarkGray
+    Write-Host "    1 / 1,3,5       $($txt.CmdToggle)" -ForegroundColor DarkGray
+    Write-Host "    $cmdRecKey / apply     $($txt.CmdRecApply -f $pendingRecommendedCount)" -ForegroundColor DarkGray
+    Write-Host "    $cmdSearchKey <text>   $($txt.CmdSearch)" -ForegroundColor DarkGray
+    Write-Host "    $cmdAllKey             $($txt.CmdAll)" -ForegroundColor DarkGray
+    Write-Host "    $cmdQuitKey            $($txt.CmdQuit)" -ForegroundColor DarkGray
     Write-Host ""
-    Write-Host "  Resumo: $totalOk configurado(s), $totalRec recomendado(s) pendente(s)" -ForegroundColor DarkCyan
-    if ($filtroAtual) { Write-Host "  Filtro: '$filtroAtual'" -ForegroundColor Cyan }
+    Write-Host "  $($txt.SummaryInfo -f $configuredCount, $pendingRecommendedCount)" -ForegroundColor DarkCyan
+    if ($currentFilter) { Write-Host "  $($txt.FilterInfo -f $currentFilter)" -ForegroundColor Cyan }
     Write-Host ""
 
-    $entrada = (Read-Host "  >").Trim().ToLower()
+    $commandInput = (Read-Host "  >").Trim().ToLower()
 
-    if ($entrada -eq "sair") { break }
+    # Match commands based on English defaults AND localized versions
+    $cmdQuit = @("quit", $cmdQuitKey) | Select-Object -Unique
+    $cmdAll = @("all", $cmdAllKey) | Select-Object -Unique
+    $cmdRecApply = @("rec", "apply", $cmdRecKey, "aplicar", "anwenden", "appliquer") | Select-Object -Unique
 
-    if ($entrada -eq "todos") { $filtroAtual = ""; continue }
+    if ($commandInput -in $cmdQuit) { break }
 
-    if ($entrada -match "^busca (.+)") { $filtroAtual = $Matches[1].Trim(); continue }
+    if ($commandInput -in $cmdAll) { $currentFilter = ""; continue }
 
-    if ($entrada -eq "rec") {
-        $feitos = 0
-        foreach ($k in $mapa.Keys) {
-            $item = $mapa[$k]
-            if ($item.Rec -and $item.Status -ne "alto") {
-                Set-Alto $item.Proc.Path $item.Proc.Name
-                $feitos++
-            }
-        }
-        if ($feitos -eq 0) { Write-Host "  Todos os recomendados ja estao configurados!" -ForegroundColor Green }
-        else { Write-Host "  $feitos app(s) configurados com sucesso!" -ForegroundColor Cyan }
-        Read-Host "  [Enter para continuar]"
+    $searchEscaped = [regex]::Escape($cmdSearchKey)
+    if ($commandInput -match "^(?:search|$searchEscaped)\s+(.+)") {
+        $currentFilter = $Matches[1].Trim()
         continue
     }
 
-    # Numeros (toggle)
-    $nums = $entrada -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ -match "^\d+$" }
-    if ($nums.Count -gt 0) {
-        foreach ($n in $nums) {
-            $idx = [int]$n
-            if ($mapa.ContainsKey($idx)) {
-                $item = $mapa[$idx]
-                if ($item.Status -eq "alto") { Remove-Alto $item.Proc.Path $item.Proc.Name }
-                else                         { Set-Alto   $item.Proc.Path $item.Proc.Name }
-            } else {
-                Write-Host "  [!] Numero $idx nao encontrado." -ForegroundColor Red
+    if ($commandInput -in $cmdRecApply) {
+        $updatedCount = 0
+        foreach ($key in $indexMap.Keys) {
+            $item = $indexMap[$key]
+            if ($item.Recommended -and $item.Status -ne "high") {
+                Set-HighPerformancePreference $item.Process.Path $item.Process.Name
+                $updatedCount++
             }
         }
-        Read-Host "  [Enter para continuar]"
+        if ($updatedCount -eq 0) {
+            Write-Host "  $($txt.AllConfigured)" -ForegroundColor Green
+        } else {
+            Write-Host "  $($txt.AppsConfigured -f $updatedCount)" -ForegroundColor Cyan
+        }
+        Read-Host "  $($txt.PressEnter)"
+        continue
+    }
+
+    # Numeric input toggles selected apps.
+    $numbers = $commandInput -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ -match "^\d+$" }
+    if ($numbers.Count -gt 0) {
+        foreach ($number in $numbers) {
+            $index = [int]$number
+            if ($indexMap.ContainsKey($index)) {
+                $item = $indexMap[$index]
+                if ($item.Status -eq "high") {
+                    Remove-GpuPreference $item.Process.Path $item.Process.Name
+                } else {
+                    Set-HighPerformancePreference $item.Process.Path $item.Process.Name
+                }
+            } else {
+                Write-Host "  $($txt.NumNotFound -f $index)" -ForegroundColor Red
+            }
+        }
+        Read-Host "  $($txt.PressEnter)"
     }
 }
 
 Write-Host ""
-Write-Host "  Pronto! Reinicie os apps alterados para aplicar as mudancas." -ForegroundColor Magenta
+Write-Host "  $($txt.DoneMessage)" -ForegroundColor Magenta
 Write-Host ""
+

@@ -1,140 +1,198 @@
-# Windows GPU Preference Manager
+# 🚀 Windows GPU Preference Manager
 
-> Interactive PowerShell script to set per-app GPU preference on Windows 10 and Windows 11.
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078d6.svg)](https://www.microsoft.com/windows)
+[![Shell](https://img.shields.io/badge/Shell-PowerShell%205.1%2B-blue.svg)](https://github.com/PowerShell/PowerShell)
+[![Languages](https://img.shields.io/badge/Languages-Multilingual%20(8%20langs)-orange.svg)](#-multilingual-support)
 
-Windows GPU Preference Manager, also distributed as `SmartGraphicsPreference`, helps you choose which Windows apps should use the high-performance GPU. It automates the manual Windows path in Settings > System > Display > Graphics settings and runs directly in the terminal with no required installer.
+An interactive, lightweight PowerShell utility to manage per-application GPU preference settings on Windows 10 and Windows 11. It automates the tedious manual configuration found in *Settings > System > Display > Graphics* and runs instantly from the command line without any heavy installation.
 
-[Leia em Portugues](README.pt-BR.md)
+---
 
-GitHub description: `Interactive PowerShell script to set per-app GPU preference on Windows`
+## 🌎 Idiomas / Languages
 
-Recommended topics: `powershell`, `windows`, `gpu`, `windows10`, `windows11`
+* [Read in English](README.md)
+* [Leia em Português](README.pt-BR.md)
 
-## Why
+---
 
-Windows lets you choose a GPU preference per app, but the option is buried in the system graphics settings. If you use a laptop with integrated and dedicated graphics, or switch between browsers, Discord, OBS, VLC, Blender, editors and games, configuring this manually is slow.
+## 💡 Why Use It?
 
-This project lists running apps, highlights apps that usually benefit from a dedicated GPU, and writes the high-performance preference for the current Windows user.
+On Windows, changing the GPU preference (Integrated vs. Dedicated High Performance GPU) for individual applications requires clicking through multiple layers of system settings, navigating folders, and selecting executables manually. If you are on a gaming laptop, dual-GPU desktop, or routinely switch preferences for web browsers, media players, streaming tools, game launchers, and 3D modeling packages, doing this one by one is slow and repetitive.
 
-## Features
+**Windows GPU Preference Manager** resolves this by letting you:
+1. **Instantly view** active non-system applications and their current GPU configurations.
+2. **Apply High Performance** settings to specific apps, multiple apps, or recommendations in batch with a single command.
+3. **Monitor real-time GPU engine utilization** for each active process directly inside the console.
 
-- Detects running apps with a valid executable path
-- Filters common Windows system processes and terminal noise
-- Recommends known GPU-accelerated apps automatically
-- Shows live GPU usage when Windows GPU counters are available
-- Sets high-performance GPU preference for one app, many apps, or all recommended apps
-- Includes a terminal search/filter command
-- Uses a toggle flow to remove a preference and return to the Windows default
-- Runs on PowerShell 5.1+ in Windows 10 and Windows 11
+---
 
-## Use Cases
+## ✨ Features
 
-- Force a browser, video player, streaming app, game launcher, or creative tool to use the dedicated GPU
-- Tune Discord, OBS, VLC, Blender, editing tools, and game launchers with fewer clicks
-- Check which running apps are currently using GPU resources
-- Share a lightweight Windows utility without shipping a heavy desktop app
+* ⚡ **Auto-Discovery:** Automatically lists currently running user applications with a valid executable path.
+* 🛡️ **System Filter:** Excludes default Windows background system noise and processes automatically.
+* 🌐 **Multilingual Support:** Supports **8 major languages** (English, Portuguese, Spanish, French, German, Chinese, Japanese, and Italian) with automatic OS display language detection and manual startup selection.
+* 📊 **Live GPU Usage:** Shows live GPU 3D engine utilization percentage per running app when Windows performance counters are active.
+* 🎯 **Smart Recommendations:** Automatically highlights applications that commonly benefit from a dedicated GPU (e.g., Chrome, OBS, Discord, VLC, Steam, Blender, Photoshop, games).
+* 🔄 **Simple Toggle Flow:** Easily activate High Performance mode or restore Windows defaults.
+* 🔍 **Terminal Filter/Search:** Instantly filter list items with the `search` command.
+* 📦 **Compile-Ready:** Includes a build script to package the script into a standalone `.exe` using `ps2exe`.
 
-## Repository Structure
+---
+
+## 🛠️ Repository Structure
 
 ```text
 Windows-GPU-Preference-Manager/
-|-- SmartGraphicsPreference.ps1   # Main PowerShell script
-|-- SmartGPU.bat                  # Double-click launcher
-|-- build/
-|   `-- build.ps1                 # Builds an optional .exe with ps2exe
-|-- README.md
-|-- README.pt-BR.md
-|-- LICENSE
-`-- .gitignore
+├── SmartGraphicsPreference.ps1   # Core PowerShell script with multilingual support
+├── SmartGPU.bat                  # Double-click batch launcher (forwards command args)
+├── build/
+│   └── build.ps1                 # Optional PS executable builder using ps2exe
+├── README.md                     # Documentation (English)
+├── README.pt-BR.md               # Documentação (Português)
+├── LICENSE                       # MIT License
+└── .gitignore                    # Git file exclusions
 ```
 
-## Requirements
+---
 
-- Windows 10 or Windows 11
-- PowerShell 5.1 or newer
-- A dedicated GPU, such as NVIDIA, AMD Radeon, or Intel Arc, if you want to use high-performance mode
+## 📋 Requirements
 
-## Usage
+* **Operating System:** Windows 10 or Windows 11
+* **Console:** Windows PowerShell 5.1 or newer
+* **Hardware:** Systems with dual GPUs (integrated + dedicated graphics such as NVIDIA GeForce/RTX, AMD Radeon, Intel Arc) to leverage the *High Performance* registry preference.
 
-Run from PowerShell:
+---
 
+## 🚀 How to Run
+
+### Option 1: Double-Click (Recommended)
+Double-click `SmartGPU.bat` in the root folder. It bypasses the execution policy automatically.
+
+### Option 2: PowerShell Console
+Launch your terminal and execute:
 ```powershell
 PowerShell -ExecutionPolicy Bypass -File "SmartGraphicsPreference.ps1"
 ```
 
-Or double-click `SmartGPU.bat` from the same folder as `SmartGraphicsPreference.ps1`.
+To run and force a specific language directly, pass the `-Language` argument:
+```powershell
+PowerShell -ExecutionPolicy Bypass -File "SmartGraphicsPreference.ps1" -Language pt
+```
+*(Supported language codes: `en`, `pt`, `es`, `fr`, `de`, `zh`, `ja`, `it`)*
 
-## Interface
+---
+
+## 🗺️ Multilingual Support
+
+Upon starting, the tool automatically detects your Windows display culture and uses the corresponding language. It also shows a menu for manual override:
+
+```text
+  Select language / Selecione o idioma / Seleccione el idioma:
+  ===========================================================
+    [1] English       [2] Português      [3] Español
+    [4] Français      [5] Deutsch        [6] 简体中文
+    [7] 日本語        [8] Italiano
+
+  Press Enter to auto-detect (Default: English)
+
+  Language [1-8]: 
+```
+
+---
+
+## 🖥️ Terminal Interface Example
 
 ```text
   =====================================================
-    Preferencia Grafica Inteligente   [Alto Desempenho]
+    Windows GPU Preference Manager   [High Performance]
   =====================================================
 
-  #    App                        Categoria    GPU%   Status
+  #    App                        Category       GPU%   Status
   ----------------------------------------------------------------
-  1    chrome                     Navegador    12%    [OK] Alto Desempenho
-  2    discord                    Comunicacao   2%    [RECOMENDADO]
-  3    vlc                        Video         0%
-  4    obs64                      Streaming     8%    [RECOMENDADO]
+  1    chrome                     Browser        12%    [OK] High Performance
+  2    discord                    Communication  2%     [RECOMMENDED]
+  3    vlc                        Video          0%     
+  4    obs64                      Streaming      8%     [RECOMMENDED]
+  5    blender                    3D             0%     [OK] High Performance
 
-  Comandos:
-    1 / 1,3,5    Ativar ou remover (toggle)
-    rec          Aplicar TODOS os recomendados (2 pendentes)
-    busca <x>    Filtrar lista (ex: busca discord)
-    todos        Limpar filtro
-    sair         Fechar
+  ----------------------------------------------------------------
+  Commands:
+    1 / 1,3,5       Toggle high-performance preference
+    rec / apply     Apply all recommended apps (2 pending)
+    search <text>   Filter list
+    all             Clear filter
+    quit            Close
+
+  Summary: 2 configured, 2 recommended pending
+  Filter: ''
+
+  > 
 ```
 
-## Commands
+---
+
+## 🕹️ Command Reference
 
 | Command | Action |
 |---|---|
-| `1` | Enables or removes the preference for app number 1 |
-| `1,3,5` | Enables or removes several apps at once |
-| `rec` | Applies high-performance preference to all pending recommended apps |
-| `busca discord` | Filters the list by app name |
-| `todos` | Clears the current filter |
-| `sair` | Exits the script |
+| `1` | Toggles (adds or removes) the High Performance preference for application number 1. |
+| `1,3,5` | Toggles preferences for multiple listed applications simultaneously (separated by commas). |
+| `rec` / `apply` | Automatically applies the High Performance preference to all pending recommended applications. |
+| `search chrome` | Filters the table view to only show processes containing "chrome". |
+| `all` | Resets the list and clears any active filters. |
+| `quit` | Safely closes the utility. |
 
-Restart affected apps after changing GPU preference so Windows can apply the new setting.
+> [!NOTE]
+> After modifying preferences, restart the target applications for Windows to apply the new GPU routing behavior.
 
-## Build Optional EXE
+---
 
-The `.exe` is optional. The PowerShell script works by itself.
+## ⚙️ Compilation (Optional .exe)
 
+To generate a standalone `.exe` executable file so you can run the utility without opening PowerShell:
 ```powershell
 PowerShell -ExecutionPolicy Bypass -File "build\build.ps1"
 ```
+The script uses `ps2exe`. If the module is not found, it automatically installs it in your user profile scope and builds `SmartGraphicsPreference.exe`.
 
-The build script uses `ps2exe`. If the module is not installed, it tries to install it for the current user.
+---
 
-## How It Works
+## 🔍 How it Works Internally
 
-The script writes per-user GPU preferences to:
-
+Under the hood, Windows stores graphics preferences per application in the current user's registry hive:
 ```text
 HKCU\SOFTWARE\Microsoft\DirectX\UserGpuPreferences
 ```
+The script writes the application's absolute path as the key name and assigns the value string:
+* `GpuPreference=2;` — Configures the app to use **High Performance** (dedicated GPU).
+* Deleting the registry key resets the application to the **Windows Default** fallback setting.
 
-It uses `GpuPreference=2` for high performance, matching the Windows Graphics settings behavior. The change applies to the current Windows user.
+---
 
-## Search Keywords
+## 🏷️ GitHub Search Optimization (SEO)
 
-PowerShell, Windows, Windows 10, Windows 11, GPU, dedicated GPU, integrated GPU, NVIDIA, AMD Radeon, Intel Arc, graphics settings, GPU preference, per-app GPU preference, UserGpuPreferences, high performance GPU, Windows graphics settings.
+To optimize this repository for discoverability on GitHub, apply the following **Topics** in your GitHub repository settings:
 
-## Contributing
+`powershell` · `windows-utility` · `gpu-preference` · `nvidia` · `amd-radeon` · `graphics-preference` · `high-performance` · `performance-tuning` · `gaming-optimization` · `windows11` · `windows10` · `windows-11` · `windows-10` · `gpu-monitor` · `low-overhead` · `multilingual`
 
-The easiest contribution is adding known apps to the `$appsDB` dictionary in `SmartGraphicsPreference.ps1`.
+### Keywords for Web Indexing:
+Windows GPU Preference registry bypass, set GPU per app cmd, PowerShell GPU switcher, force dedicated GPU Windows 10, graphics settings command line, UserGpuPreferences modifier tool, lightweight GPU optimizer.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you want to expand the smart recommendations database, add new apps to the `$appDatabase` hashtable in [SmartGraphicsPreference.ps1](file:///c:/Users/User/Desktop/SmartGPU/claude_analisar/SmartGraphicsPreference.ps1):
 
 ```powershell
-$appsDB = @{
-    "myapp" = @{ Cat = "Video"; Rec = $true }
-}
+"newapp" = @{ Category = "Games"; Recommended = $true }
 ```
+- `Category`: Choose a category string (Browser, Video, 3D, Design, Video Edit, Streaming, Games, Communication, Developer, Other).
+- `Recommended`: Set `$true` for apps that benefit from a dedicated GPU, or `$false` to categorize without auto-recommending.
 
-Use `Rec = $true` for apps that usually benefit from a dedicated GPU. Use `Rec = $false` for apps that should be categorized without an automatic recommendation.
+---
 
-## License
+## 📄 License
 
-MIT. See `LICENSE`.
+This project is licensed under the [MIT License](LICENSE).
